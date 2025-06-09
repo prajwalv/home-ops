@@ -21,7 +21,7 @@ cniConfig:
 nodes:
   - hostname: "pvcorp-home-01"
     ipAddress: "192.168.1.13"
-    installDisk: "/dev/sdb"
+    installDisk: "/dev/sdd"
     machineSpec:
       secureboot: false
     talosImageURL: factory.talos.dev/installer/fd096f676a0df013f9631767d26696f8cb5ba7b7d3921cd8781a061a7ce9016d
@@ -38,21 +38,6 @@ nodes:
         mtu: 1500
         vip:
           ip: "192.168.1.200"
-    patches:
-      - # Encrypt system disk with TPM
-        |-
-        machine:
-          systemDiskEncryption:
-            state:
-              provider: luks2
-              keys:
-                - slot: 0
-                  tpm: {}
-            ephemeral:
-              provider: luks2
-              keys:
-                - slot: 0
-                  tpm: {}
 
 # Global patches
 patches:

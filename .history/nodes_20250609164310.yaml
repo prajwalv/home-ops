@@ -1,0 +1,11 @@
+---
+nodes:
+  - name: "pvcorp-home-01"
+    address: "192.168.1.13"
+    controller: true
+    disk: /dev/sdd
+    mac_addr: "d4:ae:52:7a:14:63"
+    schematic_id: "fd096f676a0df013f9631767d26696f8cb5ba7b7d3921cd8781a061a7ce9016d"
+    mtu: 1500
+    secureboot: false
+    encrypt_disk: false
