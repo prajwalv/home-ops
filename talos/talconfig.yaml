@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
+---
+clusterName: kubernetes
+
+talosVersion: "${talosVersion}"
+kubernetesVersion: "${kubernetesVersion}"
+
+endpoint: https://192.168.1.200:6443
+additionalApiServerCertSans: &sans
+  - "127.0.0.1"
+  - "192.168.1.200"
+additionalMachineCertSans: *sans
+
+clusterPodNets: ["10.42.0.0/16"]
+clusterSvcNets: ["10.43.0.0/16"]
+
+# Disable built-in CNI to use Cilium
+cniConfig:
+  name: none
+
+nodes:
+  - hostname: "pvcorp-home-01"
+    ipAddress: "192.168.1.13"
+    installDisk: "/dev/sdb"
+    machineSpec:
+      secureboot: false
+    talosImageURL: factory.talos.dev/installer/fd096f676a0df013f9631767d26696f8cb5ba7b7d3921cd8781a061a7ce9016d
+    controlPlane: true
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "d4:ae:52:7a:14:63"
+        dhcp: false
+        addresses:
+          - "192.168.1.13/24"
+        routes:
+          - network: "0.0.0.0/0"
+            gateway: "192.168.1.1"
+        mtu: 1500
+        vip:
+          ip: "192.168.1.200"
+    patches:
+      - # Encrypt system disk with TPM
+        |-
+        machine:
+          systemDiskEncryption:
+            state:
+              provider: luks2
+              keys:
+                - slot: 0
+                  tpm: {}
+            ephemeral:
+              provider: luks2
+              keys:
+                - slot: 0
+                  tpm: {}
+
+# Global patches
+patches:
+  - "@./patches/global/machine-files.yaml"
+  - "@./patches/global/machine-kubelet.yaml"
+  - "@./patches/global/machine-network.yaml"
+  - "@./patches/global/machine-sysctls.yaml"
+  - "@./patches/global/machine-time.yaml"
+
+# Controller patches
+controlPlane:
+  patches:
+    - "@./patches/controller/admission-controller-patch.yaml"
+    - "@./patches/controller/cluster.yaml"
+
